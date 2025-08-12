@@ -1,0 +1,14 @@
+{
+  "name": "online-soundboard",
+  "version": "1.0.0",
+  "description": "Simple web-based soundboard allowing file uploads and playback",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}
