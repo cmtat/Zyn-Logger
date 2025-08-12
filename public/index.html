@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Online Soundboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #sounds button { display: block; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Online Soundboard</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="sound" accept="audio/*" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="sounds"></div>
+
+    <script>
+    async function fetchSounds() {
+        const res = await fetch('/files');
+        const files = await res.json();
+        const container = document.getElementById('sounds');
+        container.innerHTML = '';
+        files.forEach(file => {
+            const button = document.createElement('button');
+            button.textContent = file;
+            const audio = new Audio('uploads/' + file);
+            button.addEventListener('click', () => {
+                audio.currentTime = 0;
+                audio.play();
+            });
+            container.appendChild(button);
+        });
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        await fetch('/upload', { method: 'POST', body: formData });
+        e.target.reset();
+        fetchSounds();
+    });
+
+    fetchSounds();
+    </script>
+</body>
+</html>
