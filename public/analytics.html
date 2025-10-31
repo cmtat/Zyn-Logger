@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zyn Tracker - Analytics</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-bar">
+      <h1>Zyn Tracker</h1>
+      <nav>
+        <a href="/index.html">Log</a>
+        <a href="/logs.html">History</a>
+        <a href="/analytics.html" class="active">Analytics</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <div class="card-header">
+          <h2>Usage Overview</h2>
+          <select id="window-select" class="select">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+        </div>
+        <canvas id="daily-chart" height="200"></canvas>
+      </section>
+
+      <section class="card">
+        <h2>Weekly trend</h2>
+        <canvas id="weekly-chart" height="200"></canvas>
+      </section>
+
+      <section class="card">
+        <h2>Monthly trend</h2>
+        <canvas id="monthly-chart" height="200"></canvas>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/analytics.js" type="module"></script>
+  </body>
+</html>

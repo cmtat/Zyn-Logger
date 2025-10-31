@@ -1,14 +1,14 @@
 {
-  "name": "online-soundboard",
+  "name": "zyn-tracker",
   "version": "1.0.0",
-  "description": "Simple web-based soundboard allowing file uploads and playback",
+  "description": "Simple web app for tracking Zyn pouch usage with analytics and export",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js",
     "test": "echo \"No tests specified\" && exit 0"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "multer": "^1.4.5-lts.1"
+    "express": "^4.19.2"
   }
 }

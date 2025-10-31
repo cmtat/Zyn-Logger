@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zyn Tracker - History</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-bar">
+      <h1>Zyn Tracker</h1>
+      <nav>
+        <a href="/index.html">Log</a>
+        <a href="/logs.html" class="active">History</a>
+        <a href="/analytics.html">Analytics</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section class="card">
+        <div class="card-header">
+          <h2>All Logs</h2>
+          <a class="button" href="/api/export">Export to CSV</a>
+        </div>
+        <p class="muted">
+          Tap a time to edit it or delete entries you no longer need.
+        </p>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="logs-table"></tbody>
+          </table>
+        </div>
+        <p id="logs-empty" class="muted">No logs recorded yet.</p>
+      </section>
+    </main>
+
+    <dialog id="edit-dialog">
+      <form id="edit-form">
+        <h3>Edit log</h3>
+        <input type="hidden" id="edit-id" />
+        <label for="edit-timestamp">Timestamp</label>
+        <input type="datetime-local" id="edit-timestamp" required />
+        <menu>
+          <button type="button" class="button" data-action="cancel">Cancel</button>
+          <button type="submit" class="button primary">Save</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="/js/logs.js" type="module"></script>
+  </body>
+</html>
