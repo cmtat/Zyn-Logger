@@ -1,3 +1,5 @@
+import { calculateStats, subscribe } from './storage.js';
+
 const dailyCanvas = document.querySelector('#daily-chart');
 const weeklyCanvas = document.querySelector('#weekly-chart');
 const monthlyCanvas = document.querySelector('#monthly-chart');
@@ -8,6 +10,7 @@ let weeklyChart;
 let monthlyChart;
 
 function buildChart(ctx, existingChart, config) {
+  if (!ctx) return null;
   if (existingChart) {
     existingChart.data = config.data;
     existingChart.options = config.options;
@@ -34,14 +37,6 @@ function formatMonthlyLabel(period) {
     month: 'short',
     year: 'numeric',
   });
-}
-
-async function fetchStats(windowSize) {
-  const response = await fetch(`/api/stats?window=${windowSize}`);
-  if (!response.ok) {
-    throw new Error('Failed to load stats');
-  }
-  return response.json();
 }
 
 function totalsFrom(entries) {
@@ -150,16 +145,16 @@ function renderCharts(data) {
   );
 }
 
-async function refresh() {
-  const windowSize = windowSelect.value;
+function refreshCharts() {
+  if (!windowSelect) return;
   try {
-    const stats = await fetchStats(windowSize);
+    const stats = calculateStats(windowSelect.value);
     renderCharts(stats);
   } catch (error) {
-    alert(error.message);
+    console.error(error);
   }
 }
 
-windowSelect.addEventListener('change', refresh);
-
-refresh();
+windowSelect?.addEventListener('change', refreshCharts);
+subscribe(() => refreshCharts());
+refreshCharts();

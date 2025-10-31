@@ -1,9 +1,19 @@
+import {
+  buildCsv,
+  getLogs,
+  removeLog,
+  subscribe,
+  updateLog,
+} from './storage.js';
+
 const tableBody = document.querySelector('#logs-table');
 const emptyState = document.querySelector('#logs-empty');
 const editDialog = document.querySelector('#edit-dialog');
 const editForm = document.querySelector('#edit-form');
 const editIdField = document.querySelector('#edit-id');
 const editTimestampField = document.querySelector('#edit-timestamp');
+const cancelButton = editForm?.querySelector('[data-action="cancel"]');
+const exportButton = document.querySelector('#export-logs');
 
 const formatter = new Intl.DateTimeFormat([], {
   dateStyle: 'medium',
@@ -17,80 +27,50 @@ function toLocalInputValue(timestamp) {
   return local.toISOString().slice(0, 16);
 }
 
-async function fetchLogs() {
-  const response = await fetch('/api/logs');
-  if (!response.ok) {
-    throw new Error('Failed to load logs');
-  }
-  return response.json();
-}
-
-async function updateLog(id, timestamp) {
-  const response = await fetch(`/api/logs/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ timestamp }),
-  });
-
-  if (!response.ok) {
-    const { error } = await response.json();
-    throw new Error(error || 'Unable to update log');
-  }
-}
-
-async function deleteLog(id) {
-  const response = await fetch(`/api/logs/${id}`, { method: 'DELETE' });
-  if (!response.ok) {
-    const { error } = await response.json();
-    throw new Error(error || 'Unable to delete log');
-  }
-}
-
 function renderLogs(logs) {
+  if (!tableBody || !emptyState) return;
+
   tableBody.innerHTML = '';
   if (!logs.length) {
     emptyState.hidden = false;
     emptyState.textContent = 'No logs recorded yet.';
-    return;
+  } else {
+    emptyState.hidden = true;
+    logs.forEach((log) => {
+      const tr = document.createElement('tr');
+      tr.dataset.timestamp = log.timestamp;
+      tr.innerHTML = `
+        <td>${log.id}</td>
+        <td>
+          <button class="link-button" data-action="edit" data-id="${log.id}">
+            ${formatter.format(new Date(log.timestamp))}
+          </button>
+        </td>
+        <td>
+          <div class="actions">
+            <button class="button" data-action="edit" data-id="${log.id}">Edit</button>
+            <button class="button" data-action="delete" data-id="${log.id}">Delete</button>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
   }
-  emptyState.hidden = true;
 
-  logs.forEach((log) => {
-    const tr = document.createElement('tr');
-    tr.dataset.timestamp = log.timestamp;
-    tr.innerHTML = `
-      <td>${log.id}</td>
-      <td>
-        <button class="link-button" data-action="edit" data-id="${log.id}">
-          ${formatter.format(new Date(log.timestamp))}
-        </button>
-      </td>
-      <td>
-        <div class="actions">
-          <button class="button" data-action="edit" data-id="${log.id}">Edit</button>
-          <button class="button" data-action="delete" data-id="${log.id}">Delete</button>
-        </div>
-      </td>
-    `;
-    tableBody.appendChild(tr);
-  });
-}
-
-async function refresh() {
-  try {
-    const logs = await fetchLogs();
-    renderLogs(logs);
-  } catch (error) {
-    emptyState.hidden = false;
-    emptyState.textContent = error.message;
+  if (exportButton) {
+    exportButton.disabled = !logs.length;
   }
 }
 
-tableBody.addEventListener('click', async (event) => {
+subscribe(renderLogs);
+
+tableBody?.addEventListener('click', (event) => {
   const button = event.target.closest('button');
   if (!button) return;
 
   const row = button.closest('tr');
+  if (!row) return;
+
   const id = Number(button.dataset.id);
   const action = button.dataset.action;
 
@@ -100,13 +80,10 @@ tableBody.addEventListener('click', async (event) => {
   }
 
   if (action === 'delete') {
-    if (!confirm('Delete this log?')) {
-      return;
-    }
+    if (!confirm('Delete this log?')) return;
     button.disabled = true;
     try {
-      await deleteLog(id);
-      await refresh();
+      removeLog(id);
     } catch (error) {
       alert(error.message);
     } finally {
@@ -116,35 +93,50 @@ tableBody.addEventListener('click', async (event) => {
 });
 
 function openEditor(id, timestamp) {
-  editIdField.value = id;
+  if (!editDialog || !editIdField || !editTimestampField) return;
+  editIdField.value = String(id);
   editTimestampField.value = toLocalInputValue(timestamp);
   editDialog.showModal();
 }
 
-editForm.addEventListener('submit', async (event) => {
+editForm?.addEventListener('submit', (event) => {
   event.preventDefault();
-  const id = Number(editIdField.value);
-  const timestampValue = editTimestampField.value;
-  if (!timestampValue) return;
+  if (!editIdField || !editTimestampField || !editDialog) return;
 
-  const iso = new Date(timestampValue).toISOString();
+  const id = Number(editIdField.value);
+  const raw = editTimestampField.value;
+  if (!raw) return;
+
   try {
-    await updateLog(id, iso);
+    updateLog(id, new Date(raw).toISOString());
     editDialog.close();
-    await refresh();
   } catch (error) {
     alert(error.message);
   }
 });
 
-editDialog.addEventListener('close', () => {
-  editForm.reset();
+cancelButton?.addEventListener('click', () => {
+  editDialog?.close();
 });
 
-editForm
-  .querySelector('[data-action="cancel"]')
-  .addEventListener('click', () => {
-    editDialog.close();
-  });
+editDialog?.addEventListener('close', () => {
+  editForm?.reset();
+});
 
-refresh();
+exportButton?.addEventListener('click', () => {
+  const logs = getLogs();
+  if (!logs.length) {
+    alert('No logs to export yet.');
+    return;
+  }
+  const csv = buildCsv();
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'zyn-logs.csv';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+});

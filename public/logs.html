@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Zyn Tracker - History</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="top-bar">
       <h1>Zyn Tracker</h1>
       <nav>
-        <a href="/index.html">Log</a>
-        <a href="/logs.html" class="active">History</a>
-        <a href="/analytics.html">Analytics</a>
+        <a href="./index.html">Log</a>
+        <a href="./logs.html" class="active">History</a>
+        <a href="./analytics.html">Analytics</a>
       </nav>
     </header>
 
@@ -20,7 +20,9 @@
       <section class="card">
         <div class="card-header">
           <h2>All Logs</h2>
-          <a class="button" href="/api/export">Export to CSV</a>
+          <button type="button" class="button" id="export-logs">
+            Export CSV
+          </button>
         </div>
         <p class="muted">
           Tap a time to edit it or delete entries you no longer need.
@@ -54,6 +56,6 @@
       </form>
     </dialog>
 
-    <script src="/js/logs.js" type="module"></script>
+    <script src="./js/logs.js" type="module"></script>
   </body>
 </html>
