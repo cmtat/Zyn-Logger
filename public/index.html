@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Online Soundboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #sounds button { display: block; margin: 5px 0; }
-    </style>
-</head>
-<body>
-    <h1>Online Soundboard</h1>
-    <form id="uploadForm" enctype="multipart/form-data">
-        <input type="file" name="sound" accept="audio/*" required>
-        <button type="submit">Upload</button>
-    </form>
-    <div id="sounds"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zyn Tracker</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-bar">
+      <h1>Zyn Tracker</h1>
+      <nav>
+        <a href="/index.html" class="active">Log</a>
+        <a href="/logs.html">History</a>
+        <a href="/analytics.html">Analytics</a>
+      </nav>
+    </header>
 
-    <script>
-    async function fetchSounds() {
-        const res = await fetch('/files');
-        const files = await res.json();
-        const container = document.getElementById('sounds');
-        container.innerHTML = '';
-        files.forEach(file => {
-            const button = document.createElement('button');
-            button.textContent = file;
-            const audio = new Audio('uploads/' + file);
-            button.addEventListener('click', () => {
-                audio.currentTime = 0;
-                audio.play();
-            });
-            container.appendChild(button);
-        });
-    }
+    <main class="container">
+      <section class="card">
+        <h2>Log a Zyn Pouch</h2>
+        <p class="lead">
+          Quickly track when you last put in a pouch. You can log the current time
+          or specify a different moment.
+        </p>
 
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        await fetch('/upload', { method: 'POST', body: formData });
-        e.target.reset();
-        fetchSounds();
-    });
+        <div class="form-group">
+          <button id="log-now" class="button primary">Log Right Now</button>
+        </div>
 
-    fetchSounds();
-    </script>
-</body>
+        <form id="custom-log" class="form-group">
+          <label for="timestamp">Or log a specific time</label>
+          <input
+            type="datetime-local"
+            id="timestamp"
+            name="timestamp"
+            required
+          />
+          <button type="submit" class="button">Log Custom Time</button>
+        </form>
+
+        <p class="status" id="status"></p>
+      </section>
+
+      <section class="card">
+        <h2>Today at a glance</h2>
+        <ul id="today-list" class="list"></ul>
+        <p id="today-empty" class="muted">No logs yet today.</p>
+      </section>
+    </main>
+
+    <script src="/js/log-entry.js" type="module"></script>
+  </body>
 </html>
