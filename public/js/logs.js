@@ -64,7 +64,7 @@ function renderLogs(logs) {
 
 subscribe(renderLogs);
 
-tableBody?.addEventListener('click', (event) => {
+tableBody?.addEventListener('click', async (event) => {
   const button = event.target.closest('button');
   if (!button) return;
 
@@ -83,7 +83,7 @@ tableBody?.addEventListener('click', (event) => {
     if (!confirm('Delete this log?')) return;
     button.disabled = true;
     try {
-      removeLog(id);
+      await removeLog(id);
     } catch (error) {
       alert(error.message);
     } finally {
@@ -99,7 +99,7 @@ function openEditor(id, timestamp) {
   editDialog.showModal();
 }
 
-editForm?.addEventListener('submit', (event) => {
+editForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!editIdField || !editTimestampField || !editDialog) return;
 
@@ -108,7 +108,7 @@ editForm?.addEventListener('submit', (event) => {
   if (!raw) return;
 
   try {
-    updateLog(id, new Date(raw).toISOString());
+    await updateLog(id, new Date(raw).toISOString());
     editDialog.close();
   } catch (error) {
     alert(error.message);

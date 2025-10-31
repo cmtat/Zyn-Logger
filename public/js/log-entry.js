@@ -55,14 +55,14 @@ function setStatus(message) {
   }
 }
 
-logNowButton?.addEventListener('click', () => {
+logNowButton?.addEventListener('click', async () => {
   if (!logNowButton) return;
 
   logNowButton.disabled = true;
   setStatus('Saving…');
 
   try {
-    addLog(new Date().toISOString());
+    await addLog(new Date().toISOString());
     setStatus('Logged successfully!');
   } catch (error) {
     setStatus(error.message);
@@ -71,7 +71,7 @@ logNowButton?.addEventListener('click', () => {
   }
 });
 
-form?.addEventListener('submit', (event) => {
+form?.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!form || !timestampField) return;
 
@@ -88,7 +88,7 @@ form?.addEventListener('submit', (event) => {
   setStatus('Saving…');
 
   try {
-    addLog(new Date(raw).toISOString());
+    await addLog(new Date(raw).toISOString());
     setStatus('Logged successfully!');
     form.reset();
   } catch (error) {

@@ -13,6 +13,9 @@
         <a href="./index.html" class="active">Log</a>
         <a href="./logs.html">History</a>
         <a href="./analytics.html">Analytics</a>
+        <button type="button" class="nav-button" data-action="open-settings">
+          Settings
+        </button>
       </nav>
     </header>
 
@@ -49,6 +52,65 @@
       </section>
     </main>
 
+    <dialog id="settings-dialog">
+      <form id="settings-form" novalidate>
+        <h3>GitHub Sync</h3>
+        <p class="muted small">
+          Store your log data in a GitHub repository. Generate a personal access
+          token (classic) with <code>repo</code> permission, then paste it below.
+          The token is saved in this browser only.
+        </p>
+        <div class="settings-grid">
+          <div class="form-group">
+            <label for="settings-owner">Owner or organization</label>
+            <input id="settings-owner" name="owner" autocomplete="off" required />
+          </div>
+          <div class="form-group">
+            <label for="settings-repo">Repository</label>
+            <input id="settings-repo" name="repo" autocomplete="off" required />
+          </div>
+          <div class="form-group">
+            <label for="settings-branch">Branch</label>
+            <input id="settings-branch" name="branch" value="main" autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <label for="settings-path">File path (JSON)</label>
+            <input id="settings-path" name="path" value="data/logs.json" autocomplete="off" />
+          </div>
+          <div class="form-group full-width">
+            <label for="settings-token">Personal access token</label>
+            <input
+              id="settings-token"
+              name="token"
+              type="password"
+              autocomplete="off"
+              required
+            />
+          </div>
+        </div>
+        <div id="sync-status" data-state="idle" class="sync-status">
+          <span id="sync-status-message" class="muted">
+            GitHub sync disabled. Using local storage only.
+          </span>
+        </div>
+        <menu>
+          <button type="button" class="button" data-action="reload-config">
+            Refresh from GitHub
+          </button>
+          <button type="button" class="button" data-action="clear-config">
+            Disable Sync
+          </button>
+          <button type="button" class="button" data-action="close-settings">
+            Cancel
+          </button>
+          <button type="submit" class="button primary" data-action="save-settings">
+            Save Settings
+          </button>
+        </menu>
+      </form>
+    </dialog>
+
+    <script src="./js/settings.js" type="module"></script>
     <script src="./js/log-entry.js" type="module"></script>
   </body>
 </html>
